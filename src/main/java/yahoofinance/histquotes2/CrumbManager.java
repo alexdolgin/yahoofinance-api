@@ -176,7 +176,7 @@ public class CrumbManager {
 
         URLConnection crumbConnection = redirectableCrumbRequest.openConnection(requestProperties);
         InputStreamReader is = new InputStreamReader(crumbConnection.getInputStream());
-        BufferedReader br = new BufferedReader(is);        
+        BufferedReader br = new BufferedReader(is);
         String crumbResult = br.readLine();
 
         if(crumbResult != null && !crumbResult.isEmpty()) {
@@ -185,7 +185,6 @@ public class CrumbManager {
         } else {
             log.debug("Failed to set crumb from http request. Historical quote requests will most likely fail.");
         }
-        
     }
 
     public static void refresh() throws IOException {
@@ -193,11 +192,17 @@ public class CrumbManager {
         setCrumb();
     }
 
-    public static synchronized String getCrumb() throws IOException {
-        if(crumb == null || crumb.isEmpty()) {
+    public static String getCrumb() throws IOException {
+        return getCrumb(false).getValue();
+    }
+
+    public static synchronized Crumb getCrumb(boolean forceRefresh) throws IOException {
+        boolean fresh = false;
+        if(forceRefresh || crumb == null || crumb.isEmpty()) {
             refresh();
+            fresh = true;
         }
-        return crumb;
+        return new Crumb(crumb, fresh);
     }
 
     public static String getCookie() throws IOException {
@@ -207,4 +212,7 @@ public class CrumbManager {
         return cookie;
     }
 
+    public static synchronized void injectCrumb(String c) {
+        crumb = c;
+    }
 }

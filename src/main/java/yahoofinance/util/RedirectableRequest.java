@@ -30,11 +30,11 @@ public class RedirectableRequest {
         this.protocolRedirectLimit = protocolRedirectLimit;
     }
 
-    public URLConnection openConnection() throws IOException {
+    public HttpURLConnection openConnection() throws IOException {
         return openConnection(new HashMap<String, String>());
     }
 
-    public URLConnection openConnection(Map<String, String> requestProperties) throws IOException {
+    public HttpURLConnection openConnection(Map<String, String> requestProperties) throws IOException {
         int redirectCount = 0;
         boolean hasResponse = false;
         HttpURLConnection connection = null;
@@ -51,6 +51,8 @@ public class RedirectableRequest {
 
             // only handle protocol redirects manually...
             connection.setInstanceFollowRedirects(true);
+
+            connection.connect();
 
             switch (connection.getResponseCode()) {
                 case HttpURLConnection.HTTP_MOVED_PERM:
